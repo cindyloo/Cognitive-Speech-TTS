@@ -65,7 +65,7 @@ class TextToSpeech(object):
             print("\nStatus code: " + str(response.status_code) + "\nSomething went wrong. Check your subscription key and headers.\n")
 
 if __name__ == "__main__":
-    subscription_key = "1ea5ab6891654c78b6d5a40aade2864e"
+    subscription_key = "yourkeyhere"
     app = TextToSpeech(subscription_key)
     app.get_token()
     app.save_audio()
