@@ -19,11 +19,6 @@ For example:
 subscription_key = "Your-Key-Goes-Here"
 '''
 
-if 'SPEECH_SERVICE_KEY' in os.environ:
-    subscription_key = os.environ['SPEECH_SERVICE_KEY']
-else:
-    print('Environment variable for your subscription key is not set.')
-    exit()
 
 class TextToSpeech(object):
     def __init__(self, subscription_key):
@@ -37,7 +32,7 @@ class TextToSpeech(object):
     subscription key for an access token that is valid for ten minutes.
     '''
     def get_token(self):
-        fetch_token_url = "https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken"
+        fetch_token_url = "https://eastus.api.cognitive.microsoft.com/sts/v1.0/issueToken"
         headers = {
             'Ocp-Apim-Subscription-Key': self.subscription_key
         }
@@ -45,22 +40,16 @@ class TextToSpeech(object):
         self.access_token = str(response.text)
 
     def save_audio(self):
-        base_url = 'https://westus.tts.speech.microsoft.com/'
-        path = 'cognitiveservices/v1'
-        constructed_url = base_url + path
+
+        constructed_url = "https://eastus.voice.speech.microsoft.com/cognitiveservices/v1?deploymentId=0d6cf2e3-814a-49b6-921a-f8088d98f93a"
         headers = {
             'Authorization': 'Bearer ' + self.access_token,
             'Content-Type': 'application/ssml+xml',
             'X-Microsoft-OutputFormat': 'riff-24khz-16bit-mono-pcm',
-            'User-Agent': 'YOUR_RESOURCE_NAME'
+            'User-Agent': 'Chomsky'
         }
-        xml_body = ElementTree.Element('speak', version='1.0')
-        xml_body.set('{http://www.w3.org/XML/1998/namespace}lang', 'en-us')
-        voice = ElementTree.SubElement(xml_body, 'voice')
-        voice.set('{http://www.w3.org/XML/1998/namespace}lang', 'en-US')
-        voice.set('name', 'en-US-Guy24kRUS') # Short name for 'Microsoft Server Speech Text to Speech Voice (en-US, Guy24KRUS)'
-        voice.text = self.tts
-        body = ElementTree.tostring(xml_body)
+
+        body = "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"http://www.w3.org/2001/mstts\" xml:lang=\"en-US\"><voice name=\"test1\">" + self.tts + "</voice></speak>"
 
         response = requests.post(constructed_url, headers=headers, data=body)
         '''
@@ -76,6 +65,7 @@ class TextToSpeech(object):
             print("\nStatus code: " + str(response.status_code) + "\nSomething went wrong. Check your subscription key and headers.\n")
 
 if __name__ == "__main__":
+    subscription_key = "1ea5ab6891654c78b6d5a40aade2864e"
     app = TextToSpeech(subscription_key)
     app.get_token()
     app.save_audio()
